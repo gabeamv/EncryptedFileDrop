@@ -1,4 +1,7 @@
 
+using Microsoft.EntityFrameworkCore;
+using EncryptedFileDropAPI.Data;
+
 namespace EncryptedFileDropAPI
 {
     public class Program
@@ -13,6 +16,10 @@ namespace EncryptedFileDropAPI
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            // Register the database service to the container.
+            builder.Services.AddDbContext<EncryptedFileDropContext>
+                // Configure the options to use an in-memory database named 'FileDropDB'.
+                (opt => opt.UseInMemoryDatabase("EncryptedFileDropDB"));
 
             var app = builder.Build();
 

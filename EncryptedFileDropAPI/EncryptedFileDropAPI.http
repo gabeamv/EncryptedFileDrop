@@ -1,6 +1,19 @@
-@EncryptedFileDropAPI_HostAddress = http://localhost:5255
+@EncryptedFileDropAPI_HostAddress = https://localhost:7090
 
 GET {{EncryptedFileDropAPI_HostAddress}}/weatherforecast/
 Accept: application/json
+
+###
+
+POST {{EncryptedFileDropAPI_HostAddress}}/api/user
+Content-Type: application/json
+
+{
+
+  "name": "GabrielAlexander",
+  "userName": "gabeamv",
+  "passwordHash": "test123"
+
+}
 
 ###
