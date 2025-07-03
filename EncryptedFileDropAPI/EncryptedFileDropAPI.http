@@ -17,3 +17,20 @@ Content-Type: application/json
 }
 
 ###
+
+POST {{EncryptedFileDropAPI_HostAddress}}/api/user
+Content-Type: application/json
+
+{
+  "name": "GabrielAlexander",
+  "userName": "gabeamv1111",
+  "passwordHash": "test123"
+}
+
+###
+
+@id=0
+GET {{EncryptedFileDropAPI_HostAddress}}/api/user/8
+Accept: application/json
+
+###

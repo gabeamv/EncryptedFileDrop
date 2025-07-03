@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EncryptedFileDropAPI.Models;
 using EncryptedFileDropAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace EncryptedFileDropAPI.Controllers
 {
@@ -17,28 +18,38 @@ namespace EncryptedFileDropAPI.Controllers
             _context = context;
         }
 
+        // Get the user from the database by ID.
+        [HttpGet("{id}")]
+        public async Task<ActionResult<User>> GetUser(int id)
+        {
+            // We find a user by ID from the database.
+            var user = await _context.Users.FindAsync(id);
+
+            // If what is returned is null, no user has been found.
+            if (user == null)
+            {
+                return NotFound();
+            }
+            // Return the user.
+            return user;
+        }
+
         // Adds user to the database.
         [HttpPost]
-        public JsonResult Register(User user) 
-        { 
-            
-            if (user.Id == 0) // If the user's id is null
+        public async Task<ActionResult<User>> RegisterUser(User user) 
+        {
+            // Check for duplicate usernames in the databse.
+            if (await _context.Users.AnyAsync(u => u.UserName == user.UserName))
             {
-                
-                _context.Users.Add(user); // We add the user to the database
-            } else // If the user's id is not null
-            {
-                // We check if the user is in the database.
-                var userInDb = _context.Users.Find(user.Id);
-
-                // If the user is not in the db, return not found.
-                if (userInDb == null) return new JsonResult(NotFound());
-
+                return Conflict("Username already exists");
             }
-            // Save the database.
-            _context.SaveChanges();
 
-            return new JsonResult(Ok(user));
+            // Add the user to the database.
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            // Return the location url of the newly created resource, as well as the created object.
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
     }
 }
