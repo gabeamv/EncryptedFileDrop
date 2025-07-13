@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net.Http;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,6 +20,21 @@ namespace EncryptedFileDropClient
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void Button_Login_Click(object sender, RoutedEventArgs e)
+        {
+           
+        }
+
+        private void Button_Register_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
