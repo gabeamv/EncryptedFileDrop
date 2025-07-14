@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -36,9 +37,36 @@ namespace EncryptedFileDropClient
             
         }
 
-        private void Button_Register_Click(object sender, RoutedEventArgs e)
+        // Register the user to the database.
+        private async void Button_Register_Click(object sender, RoutedEventArgs e)
         {
+            string name = NameTextBox.Text;
+            string userName = UsernameTextBox.Text;
+            string passwordHash = PasswordTextBox.Password;
 
+            var registerData = new
+            {
+                name = name,
+                userName = userName,
+                passwordHash = passwordHash
+            };
+
+            string json = JsonSerializer.Serialize(registerData);
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            try
+            {
+                using HttpResponseMessage response = await client.PostAsync("https://localhost:7090/api/user/register", content);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                ApiTestTextBox.Text = responseBody;
+            }
+            catch (HttpRequestException ex)
+            {
+                ApiTestTextBox.Text = $"Error: {ex.Message}";
+            }
         }
 
         // Method to test out API calls from client.
