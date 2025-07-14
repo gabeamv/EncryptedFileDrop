@@ -8,8 +8,8 @@ using Mapster;
 
 namespace EncryptedFileDropAPI.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
         private readonly EncryptedFileDropContext _context;
@@ -18,6 +18,13 @@ namespace EncryptedFileDropAPI.Controllers
         public UserController(EncryptedFileDropContext context) 
         {
             _context = context;
+        }
+
+        // Get the user API
+        [HttpGet]
+        public IActionResult Get()
+        {
+            return Ok("API is working.");
         }
 
         // Get the user from the database by ID.
