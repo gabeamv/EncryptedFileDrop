@@ -1,6 +1,7 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,24 +13,18 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace EncryptedFileDropClient
+namespace EncryptedFileDropClient.Pages.HomePages
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for HomePage.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class HomePage : Page
     {
-
-        static readonly HttpClient client = new HttpClient();
-
-        public MainWindow()
+        public HomePage()
         {
             InitializeComponent();
-
-            PageFrame.Content = new Pages.AuthPages.Page1();
-
         }
 
-        
+
     }
 }
