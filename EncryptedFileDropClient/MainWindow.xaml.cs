@@ -32,9 +32,33 @@ namespace EncryptedFileDropClient
             
         }
 
-        private void Button_Login_Click(object sender, RoutedEventArgs e)
+        private async void Button_Login_Click(object sender, RoutedEventArgs e)
         {
-            
+            string userName = UsernameTextBox.Text;
+            string passwordHash = PasswordTextBox.Password;
+
+            var loginData = new
+            {
+                userName = userName,
+                passwordHash = passwordHash
+            };
+
+            string json = JsonSerializer.Serialize(loginData);
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            try
+            {
+                HttpResponseMessage response = await client.PostAsync("https://localhost:7090/api/user/login", content);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+                ApiTestTextBox.Text = responseBody;
+            }
+            catch (HttpRequestException ex)
+            {
+                ApiTestTextBox.Text = $"Error: {ex.Message}";
+            }
+
         }
 
         // Register the user to the database.
