@@ -11,18 +11,21 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Security.Cryptography;
+using EncryptedFileDropClient.DTOs;
 
 namespace EncryptedFileDropClient.Pages.AuthPages
 {
     /// <summary>
     /// Interaction logic for Page1.xaml
     /// </summary>
-    public partial class Page1 : Page
+    public partial class LoginPage : Page
     {
 
         static readonly HttpClient client = new HttpClient();
 
-        public Page1()
+
+        public LoginPage()
         {
             InitializeComponent();
         }
@@ -71,6 +74,7 @@ namespace EncryptedFileDropClient.Pages.AuthPages
             string userName = UsernameTextBox.Text;
             string passwordHash = PasswordTextBox.Password;
 
+            // Anonymous class for user model data.
             var registerData = new
             {
                 name = name,
@@ -78,22 +82,52 @@ namespace EncryptedFileDropClient.Pages.AuthPages
                 passwordHash = passwordHash
             };
 
+            // Serialize the data into JSON format, as well as use it to create an HttpContent object of StringContent to send. 
             string json = JsonSerializer.Serialize(registerData);
-
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             try
             {
-                using HttpResponseMessage response = await client.PostAsync("https://localhost:7090/api/user/register", content);
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
+                // Send API request and await a response.
+                HttpResponseMessage responseRegister = await client.PostAsync("https://localhost:7090/api/user/register", content);
+                responseRegister.EnsureSuccessStatusCode();
+                string response = await responseRegister.Content.ReadAsStringAsync();
 
-                ApiTestTextBox.Text = responseBody;
+                // Deserialize the response of registering to get the id of the user that was just added.
+                //UserLoginResponse userLoginDto = JsonSerializer.Deserialize<UserLoginResponse>(response);
+
+                // Pass the id of the user to the KeyGen function to generate their key.
+                HttpResponseMessage responseKey = await KeyGen();
+                responseKey.EnsureSuccessStatusCode();
+                response = await responseKey.Content.ReadAsStringAsync();
+
+                ApiTestTextBox.Text = response;
             }
             catch (HttpRequestException ex)
             {
                 ApiTestTextBox.Text = $"Error: {ex.Message}";
             }
+        }
+
+        private async Task<HttpResponseMessage> KeyGen()
+        {
+            // RSA Key-Pair generation and export.
+            RSA rsa = RSA.Create(2048);
+            string publicKeyPem = rsa.ExportSubjectPublicKeyInfoPem();
+            string privateKeyPem = rsa.ExportRSAPrivateKeyPem();
+
+            var userKeyData = new
+            {
+                publicKey = publicKeyPem
+            };
+
+            string json = JsonSerializer.Serialize(userKeyData);
+
+            var publicKeyContent = new StringContent(json, Encoding.UTF8, "application/json");
+            
+            HttpResponseMessage response = await client.PostAsync("https://localhost:7090/api/key", publicKeyContent);
+            return response;
+           
         }
 
         // Method to test out API calls from client.
@@ -104,8 +138,6 @@ namespace EncryptedFileDropClient.Pages.AuthPages
                 using HttpResponseMessage response = await client.GetAsync("https://localhost:7090/api/user");
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
-                // Above three lines can be replaced with new helper method below
-                // string responseBody = await client.GetStringAsync(uri);
 
                 ApiTestTextBox.Text = responseBody;
             }

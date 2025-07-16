@@ -26,7 +26,7 @@ namespace EncryptedFileDropClient
         {
             InitializeComponent();
 
-            PageFrame.Content = new Pages.AuthPages.Page1();
+            PageFrame.Content = new Pages.AuthPages.LoginPage();
 
         }
 

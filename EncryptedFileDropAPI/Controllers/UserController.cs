@@ -48,20 +48,16 @@ namespace EncryptedFileDropAPI.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<UserLoginResponse>> RegisterUser(User user) 
         {
-            // Check for duplicate usernames in the databse.
             if (await _context.Users.AnyAsync(u => u.UserName == user.UserName))
             {
                 return Conflict("Username already exists");
             }
 
-            // Add the user to the database.
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            // Get the response for the user logging in
             var response = user.Adapt<UserLoginResponse>();
 
-            // Send the response to the client that the user has successfully registered.
             return Ok(response);
         }
 
