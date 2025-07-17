@@ -10,6 +10,7 @@
 
     <Grid Background="White">
         <Label Content="Home Page" HorizontalAlignment="Center" Margin="0,64,0,0" VerticalAlignment="Top"/>
+        <Button Content="Send Message" HorizontalAlignment="Center" VerticalAlignment="Center" Click="Send_Message_Button_Click"/>
 
     </Grid>
 </Page>

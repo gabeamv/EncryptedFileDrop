@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Security.Cryptography;
 using EncryptedFileDropClient.DTOs;
+using System.IO;
 
 namespace EncryptedFileDropClient.Pages.AuthPages
 {
@@ -33,6 +34,7 @@ namespace EncryptedFileDropClient.Pages.AuthPages
         private async void Button_Login_Click(object sender, RoutedEventArgs e)
         {
             string userName = UsernameTextBox.Text;
+            // TODO: Implement password hashing.
             string passwordHash = PasswordTextBox.Password;
 
             var loginData = new
@@ -50,6 +52,7 @@ namespace EncryptedFileDropClient.Pages.AuthPages
                 HttpResponseMessage response = await client.PostAsync("https://localhost:7090/api/user/login", content);
                 response.EnsureSuccessStatusCode();
 
+                // TODO: Centralized Navigation Object?
                 var mainWindow = Application.Current.MainWindow as MainWindow;
                 if (mainWindow != null) 
                 {
@@ -75,6 +78,7 @@ namespace EncryptedFileDropClient.Pages.AuthPages
             string passwordHash = PasswordTextBox.Password;
 
             // Anonymous class for user model data.
+            // TODO: Anyway to make it cleaner?
             var registerData = new
             {
                 name = name,
@@ -105,7 +109,7 @@ namespace EncryptedFileDropClient.Pages.AuthPages
                 UserLoginResponse userLoginDto = JsonSerializer.Deserialize<UserLoginResponse>(response, options);
 
                 // Pass the id of the user to the KeyGen function to generate their key.
-                HttpResponseMessage responseKey = await KeyGen(userLoginDto.Id);
+                HttpResponseMessage responseKey = await KeyPairGeneration(userLoginDto.Id);
                 responseKey.EnsureSuccessStatusCode();
                 response = await responseKey.Content.ReadAsStringAsync();
 
@@ -117,7 +121,7 @@ namespace EncryptedFileDropClient.Pages.AuthPages
             }
         }
 
-        private async Task<HttpResponseMessage> KeyGen(int id)
+        private async Task<HttpResponseMessage> KeyPairGeneration(int id)
         {
             // RSA Key-Pair generation and export.
             RSA rsa = RSA.Create(2048);
@@ -130,6 +134,18 @@ namespace EncryptedFileDropClient.Pages.AuthPages
                 publicKey = publicKeyPem
             };
 
+            // Save private key to a file.
+            // TODO: Azure Key Vault?
+            try
+            {
+                // TODO: Implement better path. Currently saved in 'C:~EncryptedFileDrop\EncryptedFileDropClient\bin\Debug\net8.0-windows'
+                File.WriteAllText("private_key.pem", privateKeyPem);
+            }
+            catch (IOException e)
+            {
+                ApiTestTextBox.Text = $"Error: {e.Message}";
+            }
+
             string json = JsonSerializer.Serialize(userKeyData); // Serialize data into Json
 
             var publicKeyContent = new StringContent(json, Encoding.UTF8, "application/json"); // Create Http payload
@@ -138,6 +154,7 @@ namespace EncryptedFileDropClient.Pages.AuthPages
             return response;
            
         }
+
 
         // Method to test out API calls from client.
         private async void Button_ApiTest_Click(object sender, RoutedEventArgs e)

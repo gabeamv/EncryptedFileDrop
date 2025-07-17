@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using EncryptedFileDropClient.Pages.MessagePages;
 
 namespace EncryptedFileDropClient.Pages.HomePages
 {
@@ -25,6 +26,13 @@ namespace EncryptedFileDropClient.Pages.HomePages
             InitializeComponent();
         }
 
-
+        public void Send_Message_Button_Click(object sender, RoutedEventArgs e)
+        {
+            var mainWindow = Application.Current.MainWindow as MainWindow;
+            if (mainWindow != null)
+            {
+                mainWindow.PageFrame.Content = new MessagePage();
+            }
+        }
     }
 }

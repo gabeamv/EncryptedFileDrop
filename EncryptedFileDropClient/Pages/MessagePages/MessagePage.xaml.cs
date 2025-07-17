@@ -1,6 +1,7 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,25 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace EncryptedFileDropClient
+namespace EncryptedFileDropClient.Pages.MessagePages
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for MessagePage.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MessagePage : Page
     {
-
-        // static readonly HttpClient client = new HttpClient();
-
-        public MainWindow()
+        public MessagePage()
         {
             InitializeComponent();
-
-            // TODO: Implement Centralized Navigation Object?
-            PageFrame.Content = new Pages.AuthPages.LoginPage();
-
         }
-
-        
     }
 }
