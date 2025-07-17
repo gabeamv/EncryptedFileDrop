@@ -20,3 +20,12 @@ Content-Type: application/json
 }
 
 ###
+
+POST {{EncryptedFileDropAPI_HostAddress}}/api/user/register
+Content-Type: application/json
+
+{
+  //User
+}
+
+###

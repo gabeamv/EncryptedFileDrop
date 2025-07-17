@@ -5,6 +5,8 @@ using EncryptedFileDropAPI.Data;
 using EncryptedFileDropAPI.DTOs.User;
 using Microsoft.EntityFrameworkCore;
 using Mapster;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace EncryptedFileDropAPI.Controllers
 {
@@ -13,11 +15,13 @@ namespace EncryptedFileDropAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly EncryptedFileDropContext _context;
+        private readonly ILogger<UserController> _logger;
 
         // Inject the db context into the controller.
-        public UserController(EncryptedFileDropContext context) 
+        public UserController(EncryptedFileDropContext context, ILogger<UserController> logger) 
         {
             _context = context;
+            _logger = logger;
         }
 
         // Get the user API
@@ -57,6 +61,8 @@ namespace EncryptedFileDropAPI.Controllers
             await _context.SaveChangesAsync();
 
             var response = user.Adapt<UserLoginResponse>();
+
+            // _logger.LogInformation("This is the response: " + response.UserName);
 
             return Ok(response);
         }

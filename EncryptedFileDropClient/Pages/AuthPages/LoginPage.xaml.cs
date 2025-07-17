@@ -93,11 +93,19 @@ namespace EncryptedFileDropClient.Pages.AuthPages
                 responseRegister.EnsureSuccessStatusCode();
                 string response = await responseRegister.Content.ReadAsStringAsync();
 
+                // The response returns camel case. Deserializing the response into UserLoginResponse DTO expects
+                // PascalCase.
+                var options = new JsonSerializerOptions
+                {
+                    // Ignore the difference of cases between response and dto to enable serialization.
+                    PropertyNameCaseInsensitive = true
+                };
+
                 // Deserialize the response of registering to get the id of the user that was just added.
-                //UserLoginResponse userLoginDto = JsonSerializer.Deserialize<UserLoginResponse>(response);
+                UserLoginResponse userLoginDto = JsonSerializer.Deserialize<UserLoginResponse>(response, options);
 
                 // Pass the id of the user to the KeyGen function to generate their key.
-                HttpResponseMessage responseKey = await KeyGen();
+                HttpResponseMessage responseKey = await KeyGen(userLoginDto.Id);
                 responseKey.EnsureSuccessStatusCode();
                 response = await responseKey.Content.ReadAsStringAsync();
 
@@ -109,7 +117,7 @@ namespace EncryptedFileDropClient.Pages.AuthPages
             }
         }
 
-        private async Task<HttpResponseMessage> KeyGen()
+        private async Task<HttpResponseMessage> KeyGen(int id)
         {
             // RSA Key-Pair generation and export.
             RSA rsa = RSA.Create(2048);
@@ -118,14 +126,15 @@ namespace EncryptedFileDropClient.Pages.AuthPages
 
             var userKeyData = new
             {
+                id = id,
                 publicKey = publicKeyPem
             };
 
-            string json = JsonSerializer.Serialize(userKeyData);
+            string json = JsonSerializer.Serialize(userKeyData); // Serialize data into Json
 
-            var publicKeyContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var publicKeyContent = new StringContent(json, Encoding.UTF8, "application/json"); // Create Http payload
             
-            HttpResponseMessage response = await client.PostAsync("https://localhost:7090/api/key", publicKeyContent);
+            HttpResponseMessage response = await client.PostAsync("https://localhost:7090/api/key", publicKeyContent); // send payload through http client
             return response;
            
         }

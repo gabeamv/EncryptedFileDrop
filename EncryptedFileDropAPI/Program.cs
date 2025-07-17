@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using EncryptedFileDropAPI.Data;
+using System.Text.Json;
 
 namespace EncryptedFileDropAPI
 {
@@ -12,7 +13,12 @@ namespace EncryptedFileDropAPI
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    // Configure json serializer to automatically use camel case.
+                    //options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.;
+                });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
